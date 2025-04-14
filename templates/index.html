@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='codemirror/lib/codemirror.css') }}" />
+    <script src="{{ url_for('static', filename='codemirror/lib/codemirror.js') }}"></script>
+    <script src="{{ url_for('static', filename='codemirror/addon/edit/matchbrackets.js') }}"></script>
+    <script src="{{ url_for('static', filename='codemirror/mode/sql.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='codemirror/addon/hint/show-hint.css') }}" />
+    <script src="{{ url_for('static', filename='codemirror/addon/hint/show-hint.js') }}"></script>
+    <script src="{{ url_for('static', filename='codemirror/addon/hint/sql-hint.js') }}"></script>
+    <style>
+      .CodeMirror {
+          border-top: 1px solid black;
+          border-bottom: 1px solid black;
+          resize: vertical;
+          height: 100;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container p-4">
+      <div class="text-center">
+        <h1>CodeMirror Demo</h1>
+      </div>
+      <form>
+        <textarea class="form-control" id="code" name="code" rows="20"></textarea>
+      </form>
+      <script>
+        window.onload = function() {
+          window.editor = CodeMirror.fromTextArea(document.getElementById('code'), {
+            mode: "text/x-sql",
+            indentWithTabs: true,
+            smartIndent: true,
+            lineNumbers: true,
+            matchBrackets : true,
+            autofocus: true,
+            extraKeys: {"Ctrl-Space": "autocomplete"},
+            hintOptions: {
+              tables: {
+                ACCOUNT: []
+              }
+            }
+          });
+
+          // --- Add this section ---
+          // Event listener for triggering autocomplete on type
+          window.editor.on("inputRead", function(cm, change) {
+            // Check if the change originated from user typing ('+input')
+            // and that the hint window isn't already open.
+            if (change.origin === "+input" && !cm.state.completionActive) {
+              // Trigger the autocomplete command programmatically
+              //cm.execCommand("autocomplete");
+              CodeMirror.commands.autocomplete(cm, null, {completeSingle: false});
+              // Note: An alternative way is to directly call the command:
+              // CodeMirror.commands.autocomplete(cm, null, {completeSingle: false});
+              // Using execCommand is often simpler if you've defined it in extraKeys.
+            }
+          });
+          // --- End of added section ---
+        };
+      </script>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+  </body>
+</html>
